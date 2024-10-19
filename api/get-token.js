@@ -1,19 +1,31 @@
-// api/get-token.js
 const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
     const clientId = process.env.SPOTIFY_CLIENT_ID;
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
-    const response = await fetch('https://accounts.spotify.com/api/token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Basic ' + Buffer.from(clientId + ':' + clientSecret).toString('base64')
-        },
-        body: 'grant_type=client_credentials'
-    });
+    if (!clientId || !clientSecret) {
+        return res.status(500).json({ error: 'Missing Spotify client ID or secret' });
+    }
 
-    const data = await response.json();
-    res.status(200).json({ token: data.access_token });
+    try {
+        const response = await fetch('https://accounts.spotify.com/api/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Basic ' + Buffer.from(clientId + ':' + clientSecret).toString('base64')
+            },
+            body: 'grant_type=client_credentials'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            return res.status(response.status).json({ error: errorData });
+        }
+
+        const data = await response.json();
+        res.status(200).json({ token: data.access_token });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
