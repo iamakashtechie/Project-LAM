@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyrics Finder</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -92,8 +85,7 @@
                 flex-direction: column;
             }
 
-            input,
-            button {
+            input, button {
                 width: 100%;
                 border-radius: 4px;
                 margin: 5px 0;
@@ -101,7 +93,6 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <h1>Lyrics Finder</h1>
@@ -113,9 +104,11 @@
         <div id="lyrics" class="scrollable"></div>
     </div>
     <script>
-        const token = 'ee9c1a061cbd43439b96781ea2038798';
-
         async function fetchWebApi(endpoint, method, body) {
+            const tokenResponse = await fetch('/api/get-token');
+            const tokenData = await tokenResponse.json();
+            const token = tokenData.token;
+
             const res = await fetch(`https://api.spotify.com/${endpoint}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -163,5 +156,4 @@
         }
     </script>
 </body>
-
 </html>
