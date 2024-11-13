@@ -105,42 +105,49 @@
     </div>
     <script>
         async function fetchWebApi(endpoint, method, body) {
-            const tokenResponse = await fetch('/api/get-token');
-            const tokenData = await tokenResponse.json();
-            const token = tokenData.token;
+            try {
+                // Get access token
+                const tokenResponse = await fetch('/api/get-token');
+                if (!tokenResponse.ok) {
+                    throw new Error('Failed to get access token');
+                }
+                const tokenData = await tokenResponse.json();
+                const token = tokenData.token;
 
-            const res = await fetch(`https://api.spotify.com/${endpoint}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                method,
-                body: JSON.stringify(body)
-            });
-            return await res.json();
+                // Call Spotify API
+                const res = await fetch(`https://api.spotify.com/v1/${endpoint}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    method,
+                    body: body ? JSON.stringify(body) : undefined
+                });
+
+                if (!res.ok) {
+                    throw new Error(`Spotify API error: ${res.status}`);
+                }
+
+                return await res.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
         }
 
         async function searchSongs() {
-            const song = document.getElementById('song').value;
-            const resultsDiv = document.getElementById('results');
-            const lyricsDiv = document.getElementById('lyrics');
-
-            if (!song) {
-                resultsDiv.innerHTML = 'Please enter a song name.';
-                return;
+            try {
+                const song = document.getElementById('song').value;
+                console.log('Searching for:', song);
+                
+                const data = await fetchWebApi(`search?q=${encodeURIComponent(song)}&type=track&limit=10`, 'GET');
+                console.log('Search results:', data);
+                
+                // Rest of your code...
+            } catch (error) {
+                console.error('Search error:', error);
+                document.getElementById('results').innerHTML = 'Error searching songs';
             }
-
-            const data = await fetchWebApi(`v1/search?q=${encodeURIComponent(song)}&type=track&limit=10`, 'GET');
-
-            resultsDiv.innerHTML = '';
-            lyricsDiv.innerHTML = '';
-
-            data.tracks.items.forEach(track => {
-                const div = document.createElement('div');
-                div.className = 'result-item';
-                div.innerHTML = `${track.artists.map(artist => artist.name).join(', ')} - ${track.name}`;
-                div.onclick = () => fetchLyrics(track.artists[0].name, track.name);
-                resultsDiv.appendChild(div);
-            });
         }
 
         async function fetchLyrics(artist, title) {
