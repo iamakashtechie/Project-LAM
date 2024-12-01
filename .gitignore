@@ -1,3 +1,10 @@
 test.html
 .env
 node_modules/
+api/
+__dummy/
+part1/
+part2/
+saveTopTracks.js
+topTracks.js
+listenSongsRightNow.js
