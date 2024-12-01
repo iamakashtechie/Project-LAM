@@ -4,7 +4,11 @@ require('dotenv').config();
 const fetch = require('node-fetch');
 
 const app = express();
-const port = 3000;
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    next();
+  });
+const port = process.env.PORT || 3000
 
 app.use(express.static(path.join(__dirname)));
 
