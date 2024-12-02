@@ -1,3 +1,4 @@
+# LAM: Learning Api Music
 # Lyrics Finder
 
 A web application that combines Spotify's track search with lyrics retrieval functionality.
