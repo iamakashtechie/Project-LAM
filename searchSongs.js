@@ -1,3 +1,9 @@
+document.getElementById('searchInput').addEventListener('keyup', function(event) {
+    if (event.key === 'Enter') {
+        searchSongs();
+    }
+});
+
 async function searchSongs() {
     const searchInput = document.getElementById('searchInput').value;
     const resultsDiv = document.getElementById('results');
