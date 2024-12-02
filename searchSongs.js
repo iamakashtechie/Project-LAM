@@ -10,7 +10,15 @@ async function searchSongs() {
     try {
         // Get token
         const tokenRes = await fetch('/api/token');
+        if (!tokenRes.ok) {
+            const errorData = await tokenRes.json();
+            throw new Error(`Token error: ${errorData.error}`);
+        }
+
         const tokenData = await tokenRes.json();
+        if (!tokenData.token) {
+            throw new Error('No token received');
+        }
         
         // Search tracks
         const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(searchInput)}&type=track&limit=10`, {
@@ -19,7 +27,10 @@ async function searchSongs() {
             }
         });
         
-        if (!response.ok) throw new Error('Search failed');
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Search failed: ${errorText}`);
+        }
         
         const data = await response.json();
         
@@ -42,6 +53,7 @@ async function searchSongs() {
             `).join('');
             
     } catch (error) {
+        console.error('Search error:', error);
         resultsDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
     }
 }

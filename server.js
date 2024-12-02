@@ -17,6 +17,7 @@ app.get('/api/token', async (req, res) => {
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
+        console.error('Missing credentials:', { clientId: !!clientId, clientSecret: !!clientSecret });
         return res.status(500).json({ error: 'Missing Spotify credentials' });
     }
 
@@ -31,12 +32,15 @@ app.get('/api/token', async (req, res) => {
         });
 
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Spotify token error:', errorText);
             throw new Error('Failed to get token');
         }
 
         const data = await response.json();
         res.json({ token: data.access_token });
     } catch (error) {
+        console.error('Token error:', error);
         res.status(500).json({ error: error.message });
     }
 });
