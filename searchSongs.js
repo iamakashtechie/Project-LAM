@@ -40,17 +40,20 @@ async function searchSongs() {
         }
 
         resultsDiv.innerHTML = data.tracks.items
-            .map(track => `
-                <div class="track-item" onclick="fetchLyrics('${track.artists[0].name.replace(/'/g, "\\'")}', '${track.name.replace(/'/g, "\\'")}')">
-                    <img src="${track.album.images[1]?.url || ''}" alt="${track.name}">
-                    <div class="track-info">
-                        <h3>${track.name}</h3>
-                        <p class="artist">${track.artists.map(artist => artist.name).join(', ')}</p>
-                        <p class="album">${track.album.name}</p>
-                        <a href="${track.external_urls.spotify}" target="_blank" class="spotify-link" onclick="event.stopPropagation()">Play on Spotify</a>
+        .map(track => `
+            <div class="track-item">
+                <img src="${track.album.images[1]?.url || ''}" alt="${track.name}">
+                <div class="track-info">
+                    <h3>${track.name}</h3>
+                    <p class="artist">${track.artists.map(artist => artist.name).join(', ')}</p>
+                    <p class="album">${track.album.name}</p>
+                    <div class="track-buttons">
+                        <a href="${track.external_urls.spotify}" target="_blank" class="spotify-link">Play on Spotify</a>
+                        <button class="lyrics-btn" onclick="fetchLyricsCombined('${track.artists[0].name.replace(/'/g, "\\'")}', '${track.name.replace(/'/g, "\\'")}')">Show Lyrics</button>
                     </div>
                 </div>
-            `).join('');
+            </div>
+        `).join('');
             
     } catch (error) {
         console.error('Search error:', error);

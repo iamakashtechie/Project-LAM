@@ -6,5 +6,7 @@ part1/
 part2/
 saveTopTracks.js
 topTracks.js
+fetchLyrics.js
+fetchLyricsB.js
 listenSongsRightNow.js
 .vercel
