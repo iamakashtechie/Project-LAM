@@ -1,3 +1,15 @@
+// Add source selection handler
+document.querySelectorAll('.source-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        // Update visual state
+        document.querySelectorAll('.source-btn').forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Store selected source
+        selectedSource = this.dataset.source;
+    });
+});
+
 // fetchLyricsCombined.js
 async function fetchLyricsCombined(artist, title) {
     const lyricsContainer = document.getElementById('lyrics-container');
@@ -36,10 +48,54 @@ async function fetchLyricsCombined(artist, title) {
         }
     }
 
+    async function tryLrclib() {
+        try {
+            // First search for the track
+            const searchResponse = await fetch(`https://lrclib.net/api/search?track_name=${encodeURIComponent(title)}&artist_name=${encodeURIComponent(artist)}`);
+            const searchResults = await searchResponse.json();
+
+            if (searchResults && searchResults.length > 0) {
+                // Get first match's ID
+                const trackId = searchResults[0].id;
+                
+                // Get lyrics using track ID
+                const lyricsResponse = await fetch(`https://lrclib.net/api/get/${trackId}`);
+                const lyricsData = await lyricsResponse.json();
+
+                if (lyricsData && lyricsData.plaintext) {
+                    return {
+                        lyrics: lyricsData.plaintext,
+                        source: 'LRCLIB'
+                    };
+                }
+            }
+        } catch (error) {
+            console.log('LRCLIB API failed...');
+            return null;
+        }
+    }
+
     try {
-        let result = await tryLyricsOvh();
-        if (!result) {
-            result = await tryLyrist();
+        let result = null;
+
+        switch(selectedSource) {
+            case 'lyrics.ovh':
+                result = await tryLyricsOvh();
+                break;
+            case 'lyrist':
+                result = await tryLyrist();
+                break;
+            case 'lrclib':
+                result = await tryLrclib();
+                break;
+            default: // 'auto'
+                result = await tryLyricsOvh();
+                if (!result) {
+                    result = await tryLyrist();
+                    if (!result) {
+                        result = await tryLrclib();
+                    }
+                }
         }
 
         if (result) {

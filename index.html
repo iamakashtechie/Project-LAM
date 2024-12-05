@@ -14,6 +14,17 @@
             <button onclick="searchSongs()">Search</button>
             <button onclick="getTopTracks()">Get top tracks</button>
         </div>
+
+        <div class="lyrics-source-selector">
+            <p>Select lyrics source:</p>
+            <div class="source-buttons">
+                <button class="source-btn active" data-source="auto">Auto</button>
+                <button class="source-btn" data-source="lyrics.ovh">Lyrics.ovh</button>
+                <button class="source-btn" data-source="lyrist">Lyrist</button>
+                <button class="source-btn" data-source="lrclib">LRCLIB</button>
+            </div>
+        </div>
+
         <div id="results" class="results"></div>
         <!-- <div id="lyrics" class="lyrics"></div> -->
         <div id="lyrics-container" class="lyrics-container"></div>
